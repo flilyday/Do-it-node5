@@ -37,15 +37,27 @@ var login = function(req, res) {
 			if (docs) {
 				console.dir(docs);
 
-                // 조회 결과에서 사용자 이름 확인
-				var username = docs[0].name;
-				
-				res.writeHead('200', {'Content-Type':'text/html;charset=utf8'});
-				res.write('<h1>로그인 성공</h1>');
-				res.write('<div><p>사용자 아이디 : ' + paramId + '</p></div>');
-				res.write('<div><p>사용자 이름 : ' + username + '</p></div>');
-				res.write("<br><br><a href='/public/login.html'>다시 로그인하기</a>");
-				res.end();
+				res.writeHead(200, {"Content-Type":"text/html;charset=utf-8"});
+
+				var context = {
+					userid : paramId,
+					username : docs[0].name
+				};
+				req.app.render('login_success', context, function(err, html){
+					if(err) {
+						console.error("뷰 렌더링 중 에러 발생 : " + err.stack);
+						console.log("에러 발생");
+
+						res.writeHead(200, {"Content-Type":"text/html;charset=utf8"});
+						res.write('<h1>뷰 렌더링 중 에러 발생</h1>');
+						res.write('<br><p>' + err.stack + '</p>');
+						res.end();
+
+						return
+					}
+					res.end(html)
+				})
+
 			
 			} else {  // 조회된 레코드가 없는 경우 실패 응답 전송
 				res.writeHead('200', {'Content-Type':'text/html;charset=utf8'});
@@ -135,20 +147,29 @@ var listuser = function(req, res) {
             }
 			  
 			if (results) {
-				console.dir(results);
+				console.dir(results);								
+
+				var context = {
+					results : results
+				};
+				req.app.render('listuser', context, function(err, html){
+					if(err) {
+						console.error("뷰 렌더링 중 에러 발생 : " + err.stack);
+						console.log("에러 발생");
+
+						res.writeHead(200, {"Content-Type":"text/html;charset=utf8"});
+						res.write('<h1>뷰 렌더링 중 에러 발생</h1>');
+						res.write('<br><p>' + err.stack + '</p>');
+						res.end();
+
+						return
+					}
+					res.writeHead(200, {"Content-Type":"text/html;charset=utf-8"});
+					res.end(html)
+				})
+
  
-				res.writeHead('200', {'Content-Type':'text/html;charset=utf8'});
-				res.write('<h2>사용자 리스트</h2>');
-				res.write('<div><ul>');
 				
-				for (var i = 0; i < results.length; i++) {
-					var curId = results[i]._doc.id;
-					var curName = results[i]._doc.name;
-					res.write('    <li>#' + i + ' : ' + curId + ', ' + curName + '</li>');
-				}	
-			
-				res.write('</ul></div>');
-				res.end();
 			} else {
 				res.writeHead('200', {'Content-Type':'text/html;charset=utf8'});
 				res.write('<h2>사용자 리스트 조회  실패</h2>');

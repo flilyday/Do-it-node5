@@ -39,6 +39,10 @@ var route_loader = require('./routes/route_loader');
 // 익스프레스 객체 생성
 var app = express();
 
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
+
+
 
 //===== 서버 변수 설정 및 static으로 public 폴더 설정  =====//
 console.log('config.server_port : %d', config.server_port);
